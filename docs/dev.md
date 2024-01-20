@@ -54,3 +54,7 @@ GRANT ALL  ON ALL TABLES IN SCHEMA public TO johndoe;
 GRANT ALL  ON ALL SEQUENCES IN SCHEMA public TO johndoe;
 
 ```
+
+## update schema.prisma
+
+## install pdf library
