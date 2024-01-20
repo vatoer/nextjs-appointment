@@ -9,3 +9,72 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Appointment {
+  id            String          @id @default(cuid())
+  date          DateTime
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime?        @updatedAt
+  BookedService BookedService[]
+}
+
+model BookedService {
+  id            String   @id @default(cuid())
+  date          DateTime
+  appointmentId String
+  serviceId     String
+  appointment Appointment  @relation(fields: [appointmentId], references: [id])
+  service     Service      @relation(fields: [serviceId], references: [id])
+  FilledForm  FilledForm[]
+}
+
+model Service {
+  id                 String               @id @default(cuid())
+  name               String
+  description        String?
+  price              Float?
+  duration           Int?
+  serviceCategoryId  String?
+  BookedService      BookedService[]
+  ServiceCategory    ServiceCategory?     @relation(fields: [serviceCategoryId], references: [id])
+  ServiceRequirement ServiceRequirement[]
+  Form               Form[]
+}
+
+model ServiceCategory {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  services    Service[]
+}
+
+model ServiceRequirement {
+  id          String  @id @default(cuid())
+  name        String
+  type        String
+  description String?
+  serviceId   String
+  service     Service @relation(fields: [serviceId], references: [id])
+}
+
+model Form {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  fields      Json?
+  serviceId   String
+  service     Service      @relation(fields: [serviceId], references: [id])
+  FilledForm  FilledForm[]
+}
+
+model FilledForm {
+  id         String        @id @default(cuid())
+  formId     String
+  bookedId   String
+  booked     BookedService @relation(fields: [bookedId], references: [id])
+  form       Form          @relation(fields: [formId], references: [id])
+  filledBy   String
+  filledWith Json
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime?      @updatedAt
+}
