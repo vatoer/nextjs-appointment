@@ -15,7 +15,7 @@ export default function Home() {
           </a>
         </p>
         <div>
-          <BoxLabel label="Hello World 2024 ini sangat panjang sekali" maxCharPerRow={24} row={2} />
+          <BoxLabel label="Raphaël Hello World 2024 ini sangat panjang sekali" maxCharPerRow={24} row={2} />
         </div>
       </div>
     </main>
