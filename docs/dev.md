@@ -58,3 +58,11 @@ GRANT ALL  ON ALL SEQUENCES IN SCHEMA public TO johndoe;
 ## update schema.prisma
 
 ## install pdf library
+
+## create slotpicker component 
+
+show calendar, pick date and selet slot
+
+```sh
+pnpm dlx shadcn-ui@latest add popover calendar
+```
