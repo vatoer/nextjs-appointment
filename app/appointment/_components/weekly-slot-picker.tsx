@@ -1,14 +1,19 @@
+import useDaysOff from "@/hooks/use-days-off";
 import DailySlotPicker from "./daily-slot-picker";
 
 interface IWeeklySlotPickerProps {
-  startDate?: Date|undefined|null;
+  startDate?: Date | undefined | null;
 }
 export const WeeklySlotPicker = ({
-  startDate ,
+  startDate,
   ...props
 }: IWeeklySlotPickerProps) => {
-
   startDate = startDate || new Date();
+
+  const { daysOff, isLoading, isError } = useDaysOff(); // get the days off from the hooks using SWR
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {isError}</div>;
 
   const isWeekend = (date: Date) => {
     const dayIndex = date.getDay();
@@ -62,7 +67,7 @@ export const WeeklySlotPicker = ({
     <div className="grid grid-cols-5 gap-1">
       {weekdayDates.map((date, index) => {
         return (
-          <div className="flex flex-col">
+          <div className="flex flex-col" key={index}>
             <div className="col-span-1">
               <h1>{date.toLocaleDateString()}</h1>
             </div>
