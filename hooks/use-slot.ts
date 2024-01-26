@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 type SlotState = {
   dt: Date | null;
-  setSlot: (dt: Date) => void;
+  setSlot: (dt: Date | null) => void;
 };
 
 export const useSlot = create<SlotState>((set) => ({

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDatePicker } from "@/hooks/use-date-picker";
 import { cn } from "@/lib/utils";
 import { use, useEffect, useState } from "react";
 
@@ -31,17 +32,18 @@ export const Slot = ({
 }: ISlotProps) => {
   const { start, minutes } = slot;
   const [isSelected, setIsSelected] = useState(false);
+  const datePicked = useDatePicker((state) => state.dt);
 
-  // useEffect(() => {
-  //   if (selected) {
-  //     setIsSelected(
-  //       selected.getHours() === start.getHours() &&
-  //         selected.getMinutes() === start.getMinutes() &&
-  //         selected.getDate() === start.getDate()
-  //     );
-  //   }
-  //   //console.log(selected);
-  // }, [selected]);
+  useEffect(() => {
+    if (selected) {
+      setIsSelected(
+        selected.getHours() === start.getHours() &&
+          selected.getMinutes() === start.getMinutes() &&
+          selected.getDate() === start.getDate()
+      );
+    }
+    //console.log(selected);
+  }, [selected, datePicked]);
 
   const handleClick = () => {
     setIsSelected(!isSelected);
