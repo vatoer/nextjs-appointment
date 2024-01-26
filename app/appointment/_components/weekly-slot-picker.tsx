@@ -1,23 +1,28 @@
-import useDaysOff from "@/hooks/use-days-off";
 import DailySlotPicker from "./daily-slot-picker";
 
 interface IWeeklySlotPickerProps {
   startDate?: Date | undefined | null;
+  weekendDays?: number[];
 }
 export const WeeklySlotPicker = ({
   startDate,
+  weekendDays = [0, 6], // default to Sunday and Saturday
   ...props
 }: IWeeklySlotPickerProps) => {
   startDate = startDate || new Date();
 
-  const { daysOff, isLoading, isError } = useDaysOff(); // get the days off from the hooks using SWR
-
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error: {isError}</div>;
-
   const isWeekend = (date: Date) => {
     const dayIndex = date.getDay();
-    return dayIndex === 0 || dayIndex === 6;
+    //return dayIndex === 0 || dayIndex === 6;
+    return weekendDays.includes(dayIndex);
+  };
+
+  const getNextWorkingDay = (startDate: Date) => {
+    let date = startDate;
+    while (isWeekend(date)) {
+      date.setDate(date.getDate() + 1);
+    }
+    return date;
   };
 
   const getNextMonday = (today: Date): Date => {
@@ -31,45 +36,49 @@ export const WeeklySlotPicker = ({
     return nextMonday;
   };
 
-  const getDatesForCurrentWeek = (startDate: Date) => {
+  //get dates for current week which not in weekend days
+  const getDatesForCurrentWeek = (startDate: Date): Date[] => {
     const dates = [];
-    const startDay = startDate.getDay(); // Get the day index of the start date (0 for Sunday, 1 for Monday, etc.)
-
-    // Get the date for the previous Monday
-    const previousMonday = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      startDate.getDate() - startDay + 1
-    );
-
-    // Get the dates for the previous week (Monday to Sunday)
+    const day = startDate.getDay();
+    const diff = startDate.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+    const monday = new Date(startDate.setDate(diff));
     for (let i = 0; i < 7; i++) {
-      const date = new Date(
-        previousMonday.getFullYear(),
-        previousMonday.getMonth(),
-        previousMonday.getDate() + i
-      );
-      dates.push(date);
+      dates.push(new Date(monday));
+      monday.setDate(monday.getDate() + 1);
     }
-
     return dates;
   };
 
-  //const startDate = new Date("19 jan 2024"); // Replace with your desired start date
-  if (isWeekend(startDate)) {
-    startDate.setDate(getNextMonday(startDate).getDate());
-  }
-  const weekdayDates = getDatesForCurrentWeek(startDate).filter(
-    (date) => !isWeekend(date)
-  );
+  const getWorkingDays = (date: Date, days: number): Date[] => {
+    const workingDays = [];
+    let currentDate = new Date(date);
+    let count = 0;
+    while (count < days) {
+      currentDate = getNextWorkingDay(currentDate);
+      workingDays.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+      count++;
+    }
+    return workingDays;
+  };
+
+  const weekdayDates = getWorkingDays(startDate, 5);
+  // TODO : setting locale from hook
+  const locale: Intl.LocalesArgument = "id-ID";
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  };
 
   return (
-    <div className="grid grid-cols-5 gap-1">
+    <div className="grid grid-cols-5 gap-2">
       {weekdayDates.map((date, index) => {
         return (
           <div className="flex flex-col" key={index}>
             <div className="col-span-1">
-              <h1>{date.toLocaleDateString()}</h1>
+              <h1>{date.toLocaleDateString(locale, options)}</h1>
             </div>
             <DailySlotPicker key={index} dt={date} />
           </div>

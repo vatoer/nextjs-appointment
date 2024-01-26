@@ -13,7 +13,9 @@ export function DaysOffProvider({ children }: { children: React.ReactNode }) {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <DaysOffContext.Provider value={data}>{children}</DaysOffContext.Provider>
+    <DaysOffContext.Provider value={data.offDays}>
+      {children}
+    </DaysOffContext.Provider>
   );
 }
 

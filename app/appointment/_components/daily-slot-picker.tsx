@@ -1,7 +1,7 @@
 "use client";
+import { useSlot } from "@/hooks/use-slot";
 import { useState } from "react";
 import Slot from "./slot";
-import { useSlot } from "@/hooks/use-slot";
 
 interface ISlotPickerProps {
   dt: Date;
@@ -19,11 +19,18 @@ export const DailySlotPicker = ({ dt }: ISlotPickerProps) => {
   dt.setMinutes(30);
   const slotNum = 14;
 
+  const getRandomInt = (max: number) => {
+    return Math.floor(Math.random() * max);
+  };
+
   return (
     <div>
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col space-y-2 gap-2">
         {[...Array(slotNum)].map((_, i) => {
+          // TODO : setting start time, duration, capacity, filled from database
           const start = new Date(dt.getTime() + i * 30 * 60000);
+          // const capacity = getRandomInt(5);
+          // const filled = getRandomInt(10);
           return (
             <Slot
               key={i}

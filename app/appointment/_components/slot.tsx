@@ -10,6 +10,8 @@ interface ITimeSlot {
 
 interface ISlotProps {
   slot: ITimeSlot;
+  capacity?: number;
+  filled?: number;
   onClick: (date: Date) => void;
   selected?: Date | null;
   available?: boolean;
@@ -24,30 +26,34 @@ export const Slot = ({
   onClick,
   selected,
   available = true,
+  capacity = 1,
+  filled = 0,
 }: ISlotProps) => {
   const { start, minutes } = slot;
   const [isSelected, setIsSelected] = useState(false);
 
-  useEffect(() => {
-    if (selected) {
-      setIsSelected(
-        selected.getHours() === start.getHours() &&
-          selected.getMinutes() === start.getMinutes() &&
-          selected.getDate() === start.getDate()
-      );
-    }
-    console.log(selected);
-  }, [selected]);
+  // useEffect(() => {
+  //   if (selected) {
+  //     setIsSelected(
+  //       selected.getHours() === start.getHours() &&
+  //         selected.getMinutes() === start.getMinutes() &&
+  //         selected.getDate() === start.getDate()
+  //     );
+  //   }
+  //   //console.log(selected);
+  // }, [selected]);
 
   const handleClick = () => {
+    setIsSelected(!isSelected);
     onClick(start);
   };
 
   return (
     <div
       className={cn(
-        "flex justify-center items-center h-12 w-24 border border-gray-300 rounded-md cursor-pointer",
-        isSelected && "bg-blue-500 text-white"
+        "flex justify-center items-center h-12 w-full border border-gray-300 rounded-md cursor-pointer",
+        isSelected && "bg-blue-500 text-white",
+        capacity <= filled && "bg-muted text-white"
       )}
       onClick={handleClick}
     >

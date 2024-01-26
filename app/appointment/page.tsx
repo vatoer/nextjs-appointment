@@ -12,7 +12,7 @@ export const AppointmentPage = () => {
     <div className="flex flex-col items-center text-center">
       <h1>Appointment Page</h1>
       <p>This is the appointment page</p>
-      <div className="w-full md:w-1/3">
+      <div className="w-full md:w-3/5 flex">
         <DaysOffProvider>
           <SlotPicker />
         </DaysOffProvider>

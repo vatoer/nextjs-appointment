@@ -1,34 +1,32 @@
 "use client";
 
-import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
-import { useState } from "react";
-import { is } from "date-fns/locale";
-import { SelectSingleEventHandler } from "react-day-picker";
 import { useDatePicker } from "@/hooks/use-date-picker";
-
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { is } from "date-fns/locale";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { useState } from "react";
+import { SelectSingleEventHandler } from "react-day-picker";
 
 export const DatePicker = () => {
-    const [date, setDate] = useState<Date>() // use di lokal
-    const dtState = useDatePicker() // bs di global
-    const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+  const [date, setDate] = useState<Date>(); // use di lokal
+  const dtState = useDatePicker(); // bs di global
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
+  const handleSelect: SelectSingleEventHandler = (date) => {
+    setDate(date);
+    dtState.setDate(date);
+    setIsPopoverOpen(false);
+  };
 
-    const handleSelect: SelectSingleEventHandler = (date) => {
-        setDate(date);
-        dtState.setDate(date);
-        setIsPopoverOpen(false);
-    }
-
-    return (
+  return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
       <PopoverTrigger asChild>
         <Button
@@ -48,11 +46,11 @@ export const DatePicker = () => {
           selected={date}
           onSelect={handleSelect}
           initialFocus
+          fromDate={new Date()}
         />
       </PopoverContent>
     </Popover>
-  )
+  );
 };
 
 export default DatePicker;
-

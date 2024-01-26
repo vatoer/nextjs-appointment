@@ -9,7 +9,7 @@ const SlotPicker = () => {
   const dtState = useDatePicker();
   const slot = useSlot();
   const offDays = useDaysOff();
-  console.log("off Days", offDays);
+  console.log("offday:", offDays);
   return (
     <div className="w-full">
       <span className="text-2xl font-bold">
@@ -25,7 +25,7 @@ const SlotPicker = () => {
           : "Pick a date"}
       </span>
       <DatePicker />
-      <WeeklySlotPicker startDate={dtState.dt} />
+      <WeeklySlotPicker startDate={dtState.dt} weekendDays={offDays} />
     </div>
   );
 };
