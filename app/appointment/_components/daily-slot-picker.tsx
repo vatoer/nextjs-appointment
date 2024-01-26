@@ -30,13 +30,15 @@ export const DailySlotPicker = ({ dt }: ISlotPickerProps) => {
           // TODO : setting start time, duration, capacity, filled from database
           const start = new Date(dt.getTime() + i * 30 * 60000);
           // const capacity = getRandomInt(5);
-          // const filled = getRandomInt(10);
+          // const filled = getRandomInt(capacity);
           return (
             <Slot
               key={i}
               slot={{ start, minutes: 30 }}
               onClick={handleClick}
               selected={slot.dt}
+              // capacity={capacity}
+              // filled={filled}
             />
           );
         })}

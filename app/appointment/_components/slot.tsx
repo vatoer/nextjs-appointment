@@ -2,6 +2,8 @@
 
 import { useDatePicker } from "@/hooks/use-date-picker";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns/format";
+import { fill } from "pdf-lib";
 import { use, useEffect, useState } from "react";
 
 interface ITimeSlot {
@@ -37,15 +39,18 @@ export const Slot = ({
   useEffect(() => {
     if (selected) {
       setIsSelected(
-        selected.getHours() === start.getHours() &&
-          selected.getMinutes() === start.getMinutes() &&
-          selected.getDate() === start.getDate()
+        format(selected, "yyyyMMdd hhmm") === format(start, "yyyyMMdd hhmm")
+        // selected.getHours() === start.getHours() &&
+        // selected.getMinutes() === start.getMinutes() &&
+        // selected.getDate() === start.getDate() &&
+        // selected.getMonth() === start.getMonth()
       );
     }
     //console.log(selected);
   }, [selected, datePicked]);
 
   const handleClick = () => {
+    if (filled >= capacity) return;
     setIsSelected(!isSelected);
     onClick(start);
   };

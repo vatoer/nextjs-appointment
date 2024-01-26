@@ -10,7 +10,8 @@ import {
 import { useDatePicker } from "@/hooks/use-date-picker";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { is } from "date-fns/locale";
+import { enUS, id, is } from "date-fns/locale";
+import { enGB } from "date-fns/locale/en-GB";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import { SelectSingleEventHandler } from "react-day-picker";
@@ -42,6 +43,7 @@ export const DatePicker = () => {
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
         <Calendar
+          locale={id}
           mode="single"
           selected={date}
           onSelect={handleSelect}
