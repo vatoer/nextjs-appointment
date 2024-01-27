@@ -13,22 +13,29 @@ export enum JenisPermohonon {
 }
 
 export interface ISPRIData {
+  perwakilan: string; // PARIS
   jenisPermohonan: JenisPermohonon;
   tanggalPermohonan: Date;
   namaLengkap: string;
   jenisKelamin: string;
   alias?: string;
+  tinggiBadan: number;
   tempatLahir: string;
+  tanggalLahir: Date;
 
   identitasNomor: string;
-  identitasDikeluarkan: string;
+  identitasTempatDikeluarkan: string;
   identitasTanggalDikeluarkan: Date;
   identitasBerlakuHingga: Date;
 
   pekerjaan: string;
-  alamatPekerjaan: string;
-  alamatIndonesia: string;
-  alamatAsing: string;
+  pekerjaanAlamat: string;
+  pekerjaanTelp: string;
+
+  indonesiaAlamat: string;
+  indonesiaTelp: string;
+  lnAlamat: string;
+  lnTelp: string;
   alamatEmail: string;
   statusSipil: string;
 

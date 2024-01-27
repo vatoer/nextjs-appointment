@@ -1,3 +1,4 @@
+import { dbAppointment } from "@/lib/db-appointment";
 import { ISPRIData, JenisPermohonon } from "@/lib/spri";
 import { format } from "date-fns/format";
 import { readFile, writeFile } from "fs/promises";
@@ -9,6 +10,14 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   console.log(params.id);
+
+  const filledForm = await dbAppointment.filledForm.findUnique({
+    where: {
+      id: "some-id",
+    },
+  });
+
+  console.log(filledForm);
 
   // get form data from database
 
@@ -22,50 +31,8 @@ export async function GET(
     day: "numeric",
   };
 
-  const formData: ISPRIData = {
-    jenisPermohonan: JenisPermohonon.BARU_PASPOR_48,
-    namaLengkap: "Shinta Dewi permata Sari kusuma Dewi",
-    jenisKelamin: "2",
-    alias: "Shinta",
-    tempatLahir: "Jakarta",
-    identitasNomor: "1234567890",
-    identitasDikeluarkan: "Jakarta",
-    pekerjaan: "Pegawai Swasta",
-    alamatPekerjaan: "Jl. Jalan No. 1 Jakarta Selatan",
-    alamatIndonesia: "Jl. Jalan No. 1 Jakarta Selatan",
-    alamatAsing: "Rue des Bons Enfants No. 1 Paris",
-    alamatEmail: "email@gmail.com",
-    statusSipil: "1",
-
-    ibuNama: "Permata Sari",
-    ibuTempatLahir: "Jakarta",
-
-    ayahNama: "Budi Pekerti",
-    ayahTempatLahir: "Jakarta",
-
-    ortuAlamat: "Jl. Jalan No. 1 Jakarta Selatan",
-
-    suamiIstriNama: "Budi Pekerti Baik Sekali",
-    suamiIstriTempatLahir: "Jakarta",
-    suamiIstriKewarganegaraan: "Indonesia",
-    suamiIstriAlamat: "Jl. Jalan No. 1 Jakarta Selatan",
-
-    darurat1Nama: "Budi Pekerti Baik Sekali",
-    darurat1Alamat: "Jl. Jalan No. 1 Jakarta Selatan",
-    darurat1Telp: "02112345678",
-    darurat1Hp: "081234567890",
-
-    createdAt: new Date(),
-    tanggalPermohonan: new Date(),
-    identitasTanggalDikeluarkan: new Date(),
-    identitasBerlakuHingga: new Date(),
-    ibuKewarganegaraan: "",
-    ibuTanggalLahir: new Date(),
-    ayahKewarganegaraan: "",
-    ayahTanggalLahir: new Date(),
-    ortuTelp: "",
-    suamiIstriTanggalLahir: new Date(),
-  };
+  const formData: ISPRIData = filledForm?.filledWith as unknown as ISPRIData;
+  //see prisma/seed.ts for sample data
 
   try {
     const pdfDoc = await PDFDocument.load(
@@ -89,27 +56,41 @@ export async function GET(
     }
 
     interface IFormData {
+      perwakilan: IRowData;
       jenisPermohonan: IRowData;
       tamggalPermohonan: IRowData;
       namaLengkap: IRowData;
       jenisKelamin: IRowData;
       alias: IRowData;
+      tinggiBadan: IRowData;
       tempatLahir: IRowData;
+      tanggalLahir: IRowData;
       identitasNomor: IRowData;
-      identitasDikeluarkan: IRowData;
+      identitasTanggalDikeluarkan: IRowData;
+      identitasTempatDikeluarkan: IRowData;
+      identitasBerlakuHingga: IRowData;
       pekerjaan: IRowData;
-      alamatPekerjaan: IRowData;
-      alamatIndonesia: IRowData;
-      alamatAsing: IRowData;
+      pekerjaanAlamat: IRowData;
+      pekerjaanTelp: IRowData;
+      indonesiaAlamat: IRowData;
+      indonesiaTelp: IRowData;
+      lnAlamat: IRowData;
+      lnTelp: IRowData;
       alamatEmail: IRowData;
       statusSipil: IRowData;
       ibuNama: IRowData;
+      ibuKewarganegaraan?: IRowData;
       ibuTempatLahir: IRowData;
+      ibuTanggalLahir: IRowData;
       ayahNama: IRowData;
+      ayahKewarganegaraan?: IRowData;
       ayahTempatLahir: IRowData;
+      ayahTanggalLahir: IRowData;
       ortuAlamat: IRowData;
+      ortuTelp: IRowData;
       suamiIstriNama?: IRowData;
       suamiIstriTempatLahir?: IRowData;
+      suamiIstriTanggalLahir?: IRowData;
       suamiIstriKewarganegaraan?: IRowData;
       suamiIstriAlamat?: IRowData;
     }
@@ -122,10 +103,10 @@ export async function GET(
       darurat1Alamat: IRowData;
       darurat1Telp: IRowData;
       darurat1Hp: IRowData;
-      kontakDarurat2?: IRowData;
-      alamatKontakDarurat2?: IRowData;
-      telpKontakDarurat2?: IRowData;
-      hpKontakDarurat2?: IRowData;
+      darurat2Nama?: IRowData;
+      darurat2Alamat?: IRowData;
+      darurat2Telp?: IRowData;
+      darurat2Hp?: IRowData;
     }
 
     const pointYJenisPermohonan = (jenis: JenisPermohonon): number => {
@@ -140,6 +121,14 @@ export async function GET(
     };
 
     const formDataSpriPage1: IFormData = {
+      perwakilan: {
+        x: 120,
+        y: height - 50,
+        size: 11,
+        maxCharPerRow: 30,
+        row: 1,
+        value: formData.perwakilan.toUpperCase(),
+      },
       jenisPermohonan: {
         x: 195,
         y: height - pointYJenisPermohonan(formData.jenisPermohonan),
@@ -178,7 +167,15 @@ export async function GET(
         size: 9,
         maxCharPerRow: 25,
         row: 1,
-        value: formData.alias.toUpperCase(),
+        value: formData.alias?.toUpperCase() || "",
+      },
+      tinggiBadan: {
+        x: 495.5,
+        y: height - 315,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: formData.tinggiBadan.toString(),
       },
       tempatLahir: {
         x: 110,
@@ -188,6 +185,14 @@ export async function GET(
         row: 1,
         value: formData.tempatLahir.toUpperCase(),
       },
+      tanggalLahir: {
+        x: 465.5,
+        y: height - 337.5,
+        size: 9,
+        maxCharPerRow: 6,
+        row: 1,
+        value: format(formData.tanggalLahir, "ddMMyy"),
+      },
       identitasNomor: {
         x: 110,
         y: height - 362.5,
@@ -196,13 +201,29 @@ export async function GET(
         row: 1,
         value: formData.identitasNomor.toUpperCase(),
       },
-      identitasDikeluarkan: {
+      identitasTanggalDikeluarkan: {
+        x: 465.5,
+        y: height - 363.5,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: format(formData.identitasTanggalDikeluarkan, "ddMMyy"),
+      },
+      identitasTempatDikeluarkan: {
         x: 110,
         y: height - 387.5,
         size: 9,
         maxCharPerRow: 23,
         row: 1,
-        value: formData.identitasDikeluarkan.toUpperCase(),
+        value: formData.identitasTempatDikeluarkan.toUpperCase(),
+      },
+      identitasBerlakuHingga: {
+        x: 465.5,
+        y: height - 387.5,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: format(formData.identitasBerlakuHingga, "ddMMyy"),
       },
       pekerjaan: {
         x: 110,
@@ -212,35 +233,62 @@ export async function GET(
         row: 1,
         value: formData.pekerjaan.toUpperCase(),
       },
-      alamatPekerjaan: {
+      pekerjaanAlamat: {
         x: 110,
         y: height - 435,
         size: 9,
-        maxCharPerRow: 23,
-        row: 1,
-        value: formData.alamatPekerjaan.toUpperCase(),
+        maxCharPerRow: 30,
+        maxChar: 43,
+        row: 2,
+        value: formData.pekerjaanAlamat.toUpperCase(),
       },
-      alamatIndonesia: {
+      pekerjaanTelp: {
+        x: 346.5,
+        y: height - 452,
+        size: 9,
+        maxCharPerRow: 14,
+        row: 1,
+        value: formData.pekerjaanTelp.toUpperCase(),
+      },
+      indonesiaAlamat: {
         x: 110,
         y: height - 475,
         size: 9,
-        maxCharPerRow: 23,
-        row: 1,
-        value: formData.alamatIndonesia.toUpperCase(),
+        maxCharPerRow: 30,
+        maxChar: 43,
+        row: 2,
+        value: formData.indonesiaAlamat.toUpperCase(),
       },
-      alamatAsing: {
+      indonesiaTelp: {
+        x: 346.5,
+        y: height - 492,
+        size: 9,
+        maxCharPerRow: 14,
+        row: 1,
+        value: formData.indonesiaTelp.toUpperCase(),
+      },
+      lnAlamat: {
         x: 110,
         y: height - 515,
         size: 9,
-        maxCharPerRow: 23,
+        maxCharPerRow: 30,
+        maxChar: 43,
+        row: 2,
+        value: formData.lnAlamat.toUpperCase(),
+      },
+      lnTelp: {
+        x: 346.5,
+        y: height - 532,
+        size: 9,
+        maxCharPerRow: 14,
         row: 1,
-        value: formData.alamatAsing.toUpperCase(),
+        value: formData.lnTelp.toUpperCase(),
       },
       alamatEmail: {
         x: 110,
         y: height - 555,
         size: 9,
-        maxCharPerRow: 23,
+        maxCharPerRow: 30,
         row: 1,
         value: formData.alamatEmail.toUpperCase(),
       },
@@ -248,7 +296,7 @@ export async function GET(
         x: 182.5,
         y: height - 575,
         size: 9,
-        maxCharPerRow: 23,
+        maxCharPerRow: 1,
         row: 1,
         value: formData.statusSipil.toUpperCase(),
       },
@@ -256,9 +304,17 @@ export async function GET(
         x: 110,
         y: height - 602.5,
         size: 9,
-        maxCharPerRow: 23,
+        maxCharPerRow: 15,
         row: 1,
         value: formData.ibuNama.toUpperCase(),
+      },
+      ibuKewarganegaraan: {
+        x: 346.5,
+        y: height - 602.5,
+        size: 9,
+        maxCharPerRow: 14,
+        row: 1,
+        value: formData.ibuKewarganegaraan.toUpperCase(),
       },
       ibuTempatLahir: {
         x: 110,
@@ -268,13 +324,29 @@ export async function GET(
         row: 1,
         value: formData.ibuTempatLahir.toUpperCase(),
       },
+      ibuTanggalLahir: {
+        x: 465.5,
+        y: height - 627.5,
+        size: 9,
+        maxCharPerRow: 6,
+        row: 1,
+        value: format(formData.ibuTanggalLahir, "ddMMyy"),
+      },
       ayahNama: {
         x: 110,
         y: height - 650,
         size: 9,
-        maxCharPerRow: 23,
+        maxCharPerRow: 15,
         row: 1,
         value: formData.ayahNama.toUpperCase(),
+      },
+      ayahKewarganegaraan: {
+        x: 346.5,
+        y: height - 650,
+        size: 9,
+        maxCharPerRow: 14,
+        row: 1,
+        value: formData.ayahKewarganegaraan.toUpperCase(),
       },
       ayahTempatLahir: {
         x: 110,
@@ -284,19 +356,36 @@ export async function GET(
         row: 1,
         value: formData.ayahTempatLahir.toUpperCase(),
       },
+      ayahTanggalLahir: {
+        x: 465.5,
+        y: height - 677.5,
+        size: 9,
+        maxCharPerRow: 6,
+        row: 1,
+        value: format(formData.ayahTanggalLahir, "ddMMyy"),
+      },
       ortuAlamat: {
         x: 110,
         y: height - 700,
         size: 9,
-        maxCharPerRow: 23,
-        row: 1,
+        maxCharPerRow: 30,
+        maxChar: 43,
+        row: 2,
         value: formData.ortuAlamat.toUpperCase(),
+      },
+      ortuTelp: {
+        x: 346.5,
+        y: height - 715,
+        size: 9,
+        maxCharPerRow: 14,
+        row: 1,
+        value: formData.ortuTelp.toUpperCase(),
       },
       suamiIstriNama: {
         x: 110,
         y: height - 740,
         size: 9,
-        maxCharPerRow: 23,
+        maxCharPerRow: 30,
         row: 1,
         value: formData.suamiIstriNama?.toUpperCase(),
       },
@@ -307,6 +396,14 @@ export async function GET(
         maxCharPerRow: 23,
         row: 1,
         value: formData.suamiIstriTempatLahir?.toUpperCase(),
+      },
+      suamiIstriTanggalLahir: {
+        x: 465.5,
+        y: height - 765,
+        size: 9,
+        maxCharPerRow: 6,
+        row: 1,
+        value: format(formData.suamiIstriTanggalLahir, "ddMMyy"),
       },
       suamiIstriKewarganegaraan: {
         x: 110,
@@ -384,10 +481,43 @@ export async function GET(
         row: 1,
         value: formData.darurat1Hp.toUpperCase(),
       },
+      darurat2Nama: {
+        x: 52,
+        y: height - 267,
+        size: 9,
+        maxCharPerRow: 30,
+        row: 1,
+        value: formData.darurat2Nama?.toUpperCase() || "",
+      },
+      darurat2Alamat: {
+        x: 52,
+        y: height - 292,
+        size: 9,
+        maxCharPerRow: 30,
+        row: 2,
+        value: formData.darurat2Alamat?.toUpperCase() || "",
+      },
+      darurat2Telp: {
+        x: 52,
+        y: height - 331,
+        size: 9,
+        maxCharPerRow: 15,
+        row: 1,
+        value: formData.darurat2Telp?.toUpperCase() || "",
+      },
+      darurat2Hp: {
+        x: 286,
+        y: height - 331,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: formData.darurat2Hp?.toUpperCase() || "",
+      },
     };
 
     const drawText = (pdfPage: PDFPage, text: string, data: IRowData) => {
-      const result = text.padEnd(data.row * data.maxCharPerRow).split("");
+      const maxChar = data.maxChar || data.row * data.maxCharPerRow;
+      const result = text.padEnd(maxChar).split("", maxChar);
 
       let rowsOfChars: string[][] = [];
       for (let i = 0; i < data.row; i++) {
