@@ -1,6 +1,8 @@
+import { ISPRIData, JenisPermohonon } from "@/lib/spri";
+import { format } from "date-fns/format";
 import { readFile, writeFile } from "fs/promises";
 import { NextResponse } from "next/server";
-import { PDFDocument, StandardFonts } from "pdf-lib";
+import { PDFDocument, PDFPage, StandardFonts } from "pdf-lib";
 
 export async function GET(
   req: Request,
@@ -20,13 +22,14 @@ export async function GET(
     day: "numeric",
   };
 
-  const formData = {
+  const formData: ISPRIData = {
+    jenisPermohonan: JenisPermohonon.BARU_PASPOR_48,
     namaLengkap: "Shinta Dewi permata Sari kusuma Dewi",
     jenisKelamin: "2",
     alias: "Shinta",
     tempatLahir: "Jakarta",
-    nomorIdentitas: "1234567890",
-    tempatDikeluarkan: "Jakarta",
+    identitasNomor: "1234567890",
+    identitasDikeluarkan: "Jakarta",
     pekerjaan: "Pegawai Swasta",
     alamatPekerjaan: "Jl. Jalan No. 1 Jakarta Selatan",
     alamatIndonesia: "Jl. Jalan No. 1 Jakarta Selatan",
@@ -34,29 +37,34 @@ export async function GET(
     alamatEmail: "email@gmail.com",
     statusSipil: "1",
 
-    namaIbu: "Permata Sari",
-    tempatLahirIbu: "Jakarta",
+    ibuNama: "Permata Sari",
+    ibuTempatLahir: "Jakarta",
 
-    namaAyah: "Budi Pekerti",
-    tempatLahirAyah: "Jakarta",
+    ayahNama: "Budi Pekerti",
+    ayahTempatLahir: "Jakarta",
 
-    alamatOrtu: "Jl. Jalan No. 1 Jakarta Selatan",
+    ortuAlamat: "Jl. Jalan No. 1 Jakarta Selatan",
 
-    namaSuamiIstri: "Budi Pekerti Baik Sekali",
-    tempatLahirSuamiIstri: "Jakarta",
-    kewarganegaraanSuamiIstri: "Indonesia",
-    alamatSuamiIstri: "Jl. Jalan No. 1 Jakarta Selatan",
+    suamiIstriNama: "Budi Pekerti Baik Sekali",
+    suamiIstriTempatLahir: "Jakarta",
+    suamiIstriKewarganegaraan: "Indonesia",
+    suamiIstriAlamat: "Jl. Jalan No. 1 Jakarta Selatan",
 
-    namaAyahWali: "Budi Pekerti Baik Sekali",
-    statusPerkawinanOrtu: "Menikah",
-    namaAnak: "Shinta Dewi",
-    ttl: "Jakarta, 12-12-1990",
-    kewarganegaraanIbu: "Indonesia",
-    namaIbuWali: "Permata Sari",
-    kewarganegaraanAyah: "Perancis",
-    nomorPaspor: "1234567890",
-    createdAt: dt.toLocaleDateString("id-ID", dtOptions),
-    alamat: "Jl. Jalan No. 1 Jakarta Selatan",
+    darurat1Nama: "Budi Pekerti Baik Sekali",
+    darurat1Alamat: "Jl. Jalan No. 1 Jakarta Selatan",
+    darurat1Telp: "02112345678",
+    darurat1Hp: "081234567890",
+
+    createdAt: new Date(),
+    tanggalPermohonan: new Date(),
+    identitasTanggalDikeluarkan: new Date(),
+    identitasBerlakuHingga: new Date(),
+    ibuKewarganegaraan: "",
+    ibuTanggalLahir: new Date(),
+    ayahKewarganegaraan: "",
+    ayahTanggalLahir: new Date(),
+    ortuTelp: "",
+    suamiIstriTanggalLahir: new Date(),
   };
 
   try {
@@ -67,6 +75,7 @@ export async function GET(
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const pages = pdfDoc.getPages();
     const firstPage = pages[0];
+    const secondPage = pages[1];
     const { width, height } = firstPage.getSize();
 
     interface IRowData {
@@ -80,36 +89,73 @@ export async function GET(
     }
 
     interface IFormData {
+      jenisPermohonan: IRowData;
+      tamggalPermohonan: IRowData;
       namaLengkap: IRowData;
       jenisKelamin: IRowData;
       alias: IRowData;
       tempatLahir: IRowData;
-      nomorIdentitas: IRowData;
-      tempatDikeluarkan: IRowData;
+      identitasNomor: IRowData;
+      identitasDikeluarkan: IRowData;
       pekerjaan: IRowData;
       alamatPekerjaan: IRowData;
       alamatIndonesia: IRowData;
       alamatAsing: IRowData;
       alamatEmail: IRowData;
       statusSipil: IRowData;
-      namaIbu: IRowData;
-      tempatLahirIbu: IRowData;
-      namaAyah: IRowData;
-      tempatLahirAyah: IRowData;
-      alamatOrtu: IRowData;
-      namaSuamiIstri?: IRowData;
-      tempatLahirSuamiIstri?: IRowData;
-      kewarganegaraanSuamiIstri?: IRowData;
-      alamatSuamiIstri?: IRowData;
+      ibuNama: IRowData;
+      ibuTempatLahir: IRowData;
+      ayahNama: IRowData;
+      ayahTempatLahir: IRowData;
+      ortuAlamat: IRowData;
+      suamiIstriNama?: IRowData;
+      suamiIstriTempatLahir?: IRowData;
+      suamiIstriKewarganegaraan?: IRowData;
+      suamiIstriAlamat?: IRowData;
     }
 
-    interface IFormData2 {
-      nama: IRowData;
-      alamat: IRowData;
-      telp: IRowData;
+    interface IFormDataPage2 {
+      perubahanNama: IRowData;
+      perubahanAlamat: IRowData;
+      perubahanTelp: IRowData;
+      darurat1Nama: IRowData;
+      darurat1Alamat: IRowData;
+      darurat1Telp: IRowData;
+      darurat1Hp: IRowData;
+      kontakDarurat2?: IRowData;
+      alamatKontakDarurat2?: IRowData;
+      telpKontakDarurat2?: IRowData;
+      hpKontakDarurat2?: IRowData;
     }
 
-    const formDataSpri: IFormData = {
+    const pointYJenisPermohonan = (jenis: JenisPermohonon): number => {
+      switch (jenis.charAt(0)) {
+        case "B":
+          return 228.5;
+        case "C":
+          return 243.5;
+        default:
+          return 213.5;
+      }
+    };
+
+    const formDataSpriPage1: IFormData = {
+      jenisPermohonan: {
+        x: 195,
+        y: height - pointYJenisPermohonan(formData.jenisPermohonan),
+        size: 9,
+        maxCharPerRow: 1,
+        row: 1,
+        value: formData.jenisPermohonan.charAt(1),
+      },
+      tamggalPermohonan: {
+        x: 463,
+        y: height - 213.5,
+        size: 9,
+        maxCharPerRow: 8,
+        row: 1,
+        value: format(formData.createdAt, "ddMMyy"),
+      },
       namaLengkap: {
         x: 110,
         y: height - 275,
@@ -142,21 +188,21 @@ export async function GET(
         row: 1,
         value: formData.tempatLahir.toUpperCase(),
       },
-      nomorIdentitas: {
+      identitasNomor: {
         x: 110,
         y: height - 362.5,
         size: 9,
         maxCharPerRow: 23,
         row: 1,
-        value: formData.nomorIdentitas.toUpperCase(),
+        value: formData.identitasNomor.toUpperCase(),
       },
-      tempatDikeluarkan: {
+      identitasDikeluarkan: {
         x: 110,
         y: height - 387.5,
         size: 9,
         maxCharPerRow: 23,
         row: 1,
-        value: formData.tempatDikeluarkan.toUpperCase(),
+        value: formData.identitasDikeluarkan.toUpperCase(),
       },
       pekerjaan: {
         x: 110,
@@ -206,85 +252,141 @@ export async function GET(
         row: 1,
         value: formData.statusSipil.toUpperCase(),
       },
-      namaIbu: {
+      ibuNama: {
         x: 110,
         y: height - 602.5,
         size: 9,
         maxCharPerRow: 23,
         row: 1,
-        value: formData.namaIbu.toUpperCase(),
+        value: formData.ibuNama.toUpperCase(),
       },
-        tempatLahirIbu: {
-            x: 110,
-            y: height - 627.5,
-            size: 9,
-            maxCharPerRow: 23,
-            row: 1,
-            value: formData.tempatLahirIbu.toUpperCase(),
-        },
-        namaAyah: {
-            x: 110,
-            y: height - 650,
-            size: 9,
-            maxCharPerRow: 23,
-            row: 1,
-            value: formData.namaAyah.toUpperCase(),
-        },
-        tempatLahirAyah: {
-            x: 110,
-            y: height - 677.5,
-            size: 9,
-            maxCharPerRow: 23,
-            row: 1,
-            value: formData.tempatLahirAyah.toUpperCase(),
-        },
-        alamatOrtu: {
-            x: 110,
-            y: height - 700,
-            size: 9,
-            maxCharPerRow: 23,
-            row: 1,
-            value: formData.alamatOrtu.toUpperCase(),
-        },
-        namaSuamiIstri: {
-            x: 110,
-            y: height - 740,
-            size: 9,
-            maxCharPerRow: 23,
-            row: 1,
-            value: formData.namaSuamiIstri?.toUpperCase(),
-        },
-        tempatLahirSuamiIstri: {
-            x: 110,
-            y: height - 765,
-            size: 9,
-            maxCharPerRow: 23,
-            row: 1,
-            value: formData.tempatLahirSuamiIstri?.toUpperCase(),
-        },
-        kewarganegaraanSuamiIstri: {
-            x: 110,
-            y: height - 790,
-            size: 9,
-            maxCharPerRow: 23,
-            row: 1,
-            value: formData.kewarganegaraanSuamiIstri?.toUpperCase(),
-        },
-        alamatSuamiIstri: {
-            x: 110,
-            y: height - 815,
-            size: 9,
-            maxCharPerRow: 23,
-            row: 1,
-            value: formData.alamatSuamiIstri?.toUpperCase(),
-        },
-
-
+      ibuTempatLahir: {
+        x: 110,
+        y: height - 627.5,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: formData.ibuTempatLahir.toUpperCase(),
+      },
+      ayahNama: {
+        x: 110,
+        y: height - 650,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: formData.ayahNama.toUpperCase(),
+      },
+      ayahTempatLahir: {
+        x: 110,
+        y: height - 677.5,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: formData.ayahTempatLahir.toUpperCase(),
+      },
+      ortuAlamat: {
+        x: 110,
+        y: height - 700,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: formData.ortuAlamat.toUpperCase(),
+      },
+      suamiIstriNama: {
+        x: 110,
+        y: height - 740,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: formData.suamiIstriNama?.toUpperCase(),
+      },
+      suamiIstriTempatLahir: {
+        x: 110,
+        y: height - 765,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: formData.suamiIstriTempatLahir?.toUpperCase(),
+      },
+      suamiIstriKewarganegaraan: {
+        x: 110,
+        y: height - 790,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: formData.suamiIstriKewarganegaraan?.toUpperCase(),
+      },
+      suamiIstriAlamat: {
+        x: 110,
+        y: height - 815,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: formData.suamiIstriAlamat,
+      },
     };
 
-    //const formDataSpri2: IFormData = {};
+    const formDataSpriPage2: IFormDataPage2 = {
+      perubahanNama: {
+        x: 52,
+        y: height - 85,
+        size: 9,
+        maxCharPerRow: 30,
+        row: 1,
+        value: formData.perubahanNama?.toUpperCase() || "",
+      },
+      perubahanAlamat: {
+        x: 52,
+        y: height - 110,
+        size: 9,
+        maxCharPerRow: 30,
+        maxChar: 38,
+        row: 2,
+        value: formData.perubahanAlamat?.toUpperCase() || "",
+      },
+      perubahanTelp: {
+        x: 286,
+        y: height - 127,
+        size: 9,
+        maxCharPerRow: 14,
+        row: 1,
+        value: formData.perubahanTelp?.toUpperCase() || "",
+      },
+      darurat1Nama: {
+        x: 52,
+        y: height - 173,
+        size: 9,
+        maxCharPerRow: 30,
+        row: 1,
+        value: formData.darurat1Nama.toUpperCase(),
+      },
+      darurat1Alamat: {
+        x: 52,
+        y: height - 197,
+        size: 9,
+        maxCharPerRow: 30,
+        row: 2,
+        value: formData.darurat1Alamat.toUpperCase(),
+      },
+      darurat1Telp: {
+        x: 52,
+        y: height - 236,
+        size: 9,
+        maxCharPerRow: 15,
+        row: 1,
+        value: formData.darurat1Telp.toUpperCase(),
+      },
+      darurat1Hp: {
+        x: 286,
+        y: height - 236,
+        size: 9,
+        maxCharPerRow: 23,
+        row: 1,
+        value: formData.darurat1Hp.toUpperCase(),
+      },
+    };
 
-    const drawText = (text: string, data: IRowData) => {
+    const drawText = (pdfPage: PDFPage, text: string, data: IRowData) => {
       const result = text.padEnd(data.row * data.maxCharPerRow).split("");
 
       let rowsOfChars: string[][] = [];
@@ -301,7 +403,7 @@ export async function GET(
           const y = data.y - index * 14.75;
           row.map((char, index) => {
             const x = data.x + index * 14.75;
-            firstPage.drawText(char.toUpperCase(), {
+            pdfPage.drawText(char.toUpperCase(), {
               x,
               y,
               size: data.size,
@@ -311,12 +413,22 @@ export async function GET(
         });
     };
 
-    for (const [key, value] of Object.entries(formDataSpri)) {
-      drawText(value.value, value);
+    for (const [key, value] of Object.entries(formDataSpriPage1)) {
+      drawText(firstPage, value.value, value);
+    }
+
+    for (const [key, value] of Object.entries(formDataSpriPage2)) {
+      drawText(secondPage, value.value, value);
     }
 
     const pdfBytes = await pdfDoc.save();
-    await writeFile("./pdf-template/spriedited.pdf", pdfBytes);
+    //await writeFile("./pdf-template/spriedited.pdf", pdfBytes);
+
+    return new Response(pdfBytes, {
+      headers: {
+        "Content-Type": "application/pdf",
+      },
+    });
   } catch (error) {
     console.log(error);
   }

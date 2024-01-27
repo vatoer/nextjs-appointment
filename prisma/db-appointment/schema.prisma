@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated/client"
 }
 
 datasource db {
@@ -14,18 +15,18 @@ model Appointment {
   id            String          @id @default(cuid())
   date          DateTime
   createdAt     DateTime        @default(now())
-  updatedAt     DateTime?        @updatedAt
+  updatedAt     DateTime?       @updatedAt
   BookedService BookedService[]
 }
 
 model BookedService {
-  id            String   @id @default(cuid())
+  id            String       @id @default(cuid())
   date          DateTime
-  appointmentId String
+  appointmentId String?
   serviceId     String
-  appointment Appointment  @relation(fields: [appointmentId], references: [id])
-  service     Service      @relation(fields: [serviceId], references: [id])
-  FilledForm  FilledForm[]
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  service       Service      @relation(fields: [serviceId], references: [id])
+  FilledForm    FilledForm[]
 }
 
 model Service {
@@ -76,5 +77,5 @@ model FilledForm {
   filledBy   String
   filledWith Json
   createdAt  DateTime      @default(now())
-  updatedAt  DateTime?      @updatedAt
+  updatedAt  DateTime?     @updatedAt
 }
