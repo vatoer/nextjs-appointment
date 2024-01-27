@@ -10,8 +10,7 @@ import {
 import { useDatePicker } from "@/hooks/use-date-picker";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { enUS, id, is } from "date-fns/locale";
-import { enGB } from "date-fns/locale/en-GB";
+import { enGB, id } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import { SelectSingleEventHandler } from "react-day-picker";
@@ -49,6 +48,8 @@ export const DatePicker = () => {
           onSelect={handleSelect}
           initialFocus
           fromDate={new Date()}
+          month={date}
+          onMonthChange={setDate}
         />
       </PopoverContent>
     </Popover>

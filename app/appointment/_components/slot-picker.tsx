@@ -6,15 +6,16 @@ import { useDaysOff } from "./days-off-provider";
 import WeeklySlotPicker from "./weekly-slot-picker";
 
 const SlotPicker = () => {
-  const dtState = useDatePicker();
-  const slot = useSlot();
-  const offDays = useDaysOff();
-  console.log("offday:", offDays);
+  //const dtState = useDatePicker();
+  //const slot = useSlot();
+  const datePicked = useDatePicker((state) => state.dt); // using hooks
+  const slotPicked = useSlot((state) => state.dt); // using hooks
+  const offDays = useDaysOff(); // using context
   return (
     <div className="w-full">
       <span className="text-2xl font-bold">
-        {slot.dt
-          ? slot.dt.toLocaleDateString("id-ID", {
+        {slotPicked
+          ? slotPicked.toLocaleDateString("id-ID", {
               weekday: "long",
               year: "numeric",
               month: "long",
@@ -25,7 +26,7 @@ const SlotPicker = () => {
           : "Pick a date"}
       </span>
       <DatePicker />
-      <WeeklySlotPicker startDate={dtState.dt} weekendDays={offDays} />
+      <WeeklySlotPicker startDate={datePicked} weekendDays={offDays} />
     </div>
   );
 };

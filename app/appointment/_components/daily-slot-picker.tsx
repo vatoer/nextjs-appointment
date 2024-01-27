@@ -15,9 +15,11 @@ export const DailySlotPicker = ({ dt }: ISlotPickerProps) => {
   };
 
   //let dt = new Date();
-  dt.setHours(9);
-  dt.setMinutes(30);
-  const slotNum = 14;
+  // TODO : setting start time, duration, capacity, filled from database
+  dt.setHours(9); // set start time
+  dt.setMinutes(30); // set start time
+  const slotNum = 14; // set slot number
+  const slotDuration = 30; // set slot duration in minutes
 
   const getRandomInt = (max: number) => {
     return Math.floor(Math.random() * max);
@@ -27,14 +29,13 @@ export const DailySlotPicker = ({ dt }: ISlotPickerProps) => {
     <div>
       <div className="flex flex-col space-y-2 gap-2">
         {[...Array(slotNum)].map((_, i) => {
-          // TODO : setting start time, duration, capacity, filled from database
-          const start = new Date(dt.getTime() + i * 30 * 60000);
+          const start = new Date(dt.getTime() + i * slotDuration * 60000);
           // const capacity = getRandomInt(5);
           // const filled = getRandomInt(capacity);
           return (
             <Slot
               key={i}
-              slot={{ start, minutes: 30 }}
+              slot={{ start, minutes: slotDuration }}
               onClick={handleClick}
               selected={slot.dt}
               // capacity={capacity}

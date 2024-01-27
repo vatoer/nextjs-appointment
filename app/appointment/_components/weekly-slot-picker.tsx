@@ -4,6 +4,16 @@ interface IWeeklySlotPickerProps {
   startDate?: Date | undefined | null;
   weekendDays?: number[];
 }
+
+/**
+ * weekly-slot-picker.tsx
+ * @description
+ * this component is used to pick a slot for a week
+ * @todo
+ *  - setting locale from hook
+ *  - setting weekend days from hook, default to Sunday and Saturday, it can be changed to Friday and Saturday and can be no day off
+ *
+ */
 export const WeeklySlotPicker = ({
   startDate,
   weekendDays = [0, 6], // default to Sunday and Saturday
