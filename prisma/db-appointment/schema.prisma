@@ -24,6 +24,7 @@ model BookedService {
   date          DateTime
   appointmentId String?
   serviceId     String
+  status        String       @default("draft")
   appointment   Appointment? @relation(fields: [appointmentId], references: [id])
   service       Service      @relation(fields: [serviceId], references: [id])
   FilledForm    FilledForm[]

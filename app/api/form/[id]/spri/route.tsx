@@ -2,6 +2,7 @@ import { dbAppointment } from "@/lib/db-appointment";
 import { ISPRIData, JenisPermohonon } from "@/lib/spri";
 import { format } from "date-fns/format";
 import { readFile, writeFile } from "fs/promises";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { PDFDocument, PDFPage, StandardFonts } from "pdf-lib";
 
@@ -9,15 +10,17 @@ export async function GET(
   req: Request,
   { params }: { params: { id: string } }
 ) {
-  console.log(params.id);
+  //console.log(params.id);
 
+  const sessionid = cookies().set("sessionid", crypto.randomUUID());
+  console.log("session", sessionid);
   const filledForm = await dbAppointment.filledForm.findUnique({
     where: {
       id: "some-id",
     },
   });
 
-  console.log(filledForm);
+  //console.log(filledForm);
 
   // get form data from database
 

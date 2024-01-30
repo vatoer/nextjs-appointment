@@ -1,7 +1,10 @@
 import BoxLabel from "@/components/box-label";
+import { cookies } from "next/headers";
 import Image from "next/image";
 
 export default function Home() {
+  const sessionid = cookies().get("sessionid");
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div>
@@ -15,8 +18,16 @@ export default function Home() {
           </a>
         </p>
         <div>
-          <BoxLabel label="Raphaël Hello World 2024 ini sangat panjang sekali" maxCharPerRow={24} row={2} />
+          <BoxLabel
+            label="Raphaël Hello World 2024 ini sangat panjang sekali"
+            maxCharPerRow={24}
+            row={2}
+          />
         </div>
+        <p>
+          your session is
+          {sessionid?.value}
+        </p>
       </div>
     </main>
   );
