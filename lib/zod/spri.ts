@@ -19,7 +19,6 @@ export const spriSchema = z.object({
   }),
   alias: z.string().min(3).max(25),
   tinggiBadan: z.coerce.number().min(20).max(250),
-  beratBadan: z.number().min(1).max(250),
   tempatLahir: z.string().min(3),
   tanggalLahir: z.coerce.date(),
   identitasNomor: z.string().min(5).max(16), // asumsi KTP
