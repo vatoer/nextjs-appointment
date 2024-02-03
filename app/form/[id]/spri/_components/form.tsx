@@ -390,7 +390,7 @@ const SpriForm = () => {
             </FormRow>
             <FormRow>
               <InputForm
-                label="Tempat Lahir"
+                label="Alamat"
                 register={register}
                 name="perubahanAlamat"
                 error={errors.perubahanAlamat}
