@@ -12,6 +12,13 @@ export enum JenisPermohonon {
   "PERUBAHAN_LAIN" = "C3",
 }
 
+export enum StatusSipil {
+  "KAWIN" = "1",
+  "TIDAK_KAWIN" = "2",
+  "CERAI_MATI" = "3",
+  "CERAI_HIDUP" = "4",
+}
+
 export interface ISPRIData {
   perwakilan: string; // PARIS
   jenisPermohonan: JenisPermohonon;
@@ -78,3 +85,5 @@ export interface ISPRIData {
 
   createdAt: Date;
 }
+
+export type TSpri = ISPRIData;

@@ -11,7 +11,7 @@ pnpm dlx shadcn-ui@latest init
 pnpm add prisma -D
 pnpm prisma init
 
-## setting vscode json 
+## setting vscode json
 
 create file ` .vscode/settings.json`
 
@@ -59,10 +59,16 @@ GRANT ALL  ON ALL SEQUENCES IN SCHEMA public TO johndoe;
 
 ## install pdf library
 
-## create slotpicker component 
+## create slotpicker component
 
 show calendar, pick date and selet slot
 
 ```sh
 pnpm dlx shadcn-ui@latest add popover calendar
+```
+
+## create form
+
+```sh
+pnpm add react-hook-form @hookform/resolvers zod
 ```
