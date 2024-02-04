@@ -11,6 +11,7 @@ const SlotPicker = () => {
   const datePicked = useDatePicker((state) => state.dt); // using hooks
   const slotPicked = useSlot((state) => state.dt); // using hooks
   const offDays = useDaysOff(); // using context
+  const onSelect = useDatePicker((state) => state.setDate); // using hooks
   return (
     <div className="w-full">
       <span className="text-2xl font-bold">
@@ -25,7 +26,7 @@ const SlotPicker = () => {
             })
           : "Pick a date"}
       </span>
-      <DatePicker />
+      <DatePicker onSelect={onSelect} />
       <WeeklySlotPicker startDate={datePicked} weekendDays={offDays} />
     </div>
   );

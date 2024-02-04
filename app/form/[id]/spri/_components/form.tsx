@@ -1,7 +1,9 @@
 "use client";
+import DatePickerForm from "@/app/form/_components/datepicker-form";
 import FormRow from "@/app/form/_components/form-row";
 import InputForm from "@/app/form/_components/input-form";
 import SelectForm from "@/app/form/_components/select-form";
+import DatePicker from "@/components/date-picker";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
@@ -47,11 +49,12 @@ const SpriForm = () => {
 
   return (
     <div className="py-10">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-2"
-        noValidate
-      >
+      <h1 className="text-lg font-semibold mb-4 w-full text-center">
+        Formulir Surat Perjalanan Republik Indonesia untuk Warga Negara
+        Indonesia di Luar Negeri
+      </h1>
+      <form className="flex flex-col gap-2" noValidate>
+        <h1 className="text-md font-semibold">Data Permohonan</h1>
         <FormRow>
           <SelectForm
             label="Jenis Permohonan"
@@ -123,12 +126,14 @@ const SpriForm = () => {
             error={errors.tempatLahir}
             className="md:w-2/3"
           />
-          <InputForm
+          <DatePickerForm
             label="Tanggal Lahir"
             register={register}
             name="tanggalLahir"
             error={errors.tanggalLahir}
             className="md:w-1/3"
+            fromDate={new Date(1900, 1, 1)}
+            toDate={new Date()}
           />
         </FormRow>
         <FormRow>
@@ -501,7 +506,6 @@ const SpriForm = () => {
             type="button"
             onClick={() => {
               console.log("submitting");
-              handleSubmit(onSubmit)();
               console.log(
                 isDirty,
                 isValid,
@@ -509,6 +513,7 @@ const SpriForm = () => {
                 isSubmitSuccessful,
                 isValid
               );
+              handleSubmit(onSubmit)();
             }}
           >
             Simpan dan Lanjutkan
