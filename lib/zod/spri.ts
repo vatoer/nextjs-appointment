@@ -13,6 +13,12 @@ export const statusSipilSchema = z.nativeEnum(StatusSipil, {
 
 export const genericStringSchema = z.string().min(3).max(25);
 
+export const genericTanggalSchema = z.coerce.date({
+  errorMap: (issue, ctx) => ({
+    message: "Tanggal tidak valid ",
+  }),
+});
+
 export const perubahanNamaSchema = z.string().min(3).max(25);
 
 export const spriSchema = z
@@ -25,7 +31,7 @@ export const spriSchema = z
     alias: z.string().min(3).max(25),
     tinggiBadan: z.coerce.number().min(20).max(250),
     tempatLahir: z.string().min(3),
-    tanggalLahir: z.coerce.date(),
+    tanggalLahir: genericTanggalSchema,
     identitasNomor: z.string().min(5).max(16), // asumsi KTP
     identitasTanggalDikeluarkan: z.coerce.date(),
     identitasTempatDikeluarkan: z.string().min(3),
@@ -66,40 +72,46 @@ export const spriSchema = z
     darurat2Telp: z.string(),
     darurat2Hp: z.string(),
   })
-  .superRefine(({ jenisPermohonan, perubahanNama, perubahanAlamat }, ctx) => {
-    if (jenisPermohonan.charAt(0) === "C") {
-      if (perubahanNama === undefined) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Data tidak valid`,
-          path: ["perubahanNama"],
-        });
-        return false;
-      }
-
-      const checkPerubahanNama = perubahanNamaSchema.safeParse(perubahanNama);
-
-      console.log("checkPerubahanNama", checkPerubahanNama);
-
-      if (checkPerubahanNama.success === false) {
-        checkPerubahanNama.error.issues.forEach((issue) => {
+  .superRefine(
+    (
+      { tanggalLahir, jenisPermohonan, perubahanNama, perubahanAlamat },
+      ctx
+    ) => {
+      console.log("tanggalLahir", tanggalLahir);
+      if (jenisPermohonan.charAt(0) === "C") {
+        if (perubahanNama === undefined) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: issue.message,
+            message: `Data tidak valid`,
             path: ["perubahanNama"],
           });
-        });
-        // ctx.addIssue({
-        //   code: z.ZodIssueCode.custom,
-        //   message: `Data tidak valid lagi`,
-        //   path: ["perubahanNama"],
-        // });
-        return false;
-      }
-    }
+          return false;
+        }
 
-    return z.NEVER;
-  });
+        const checkPerubahanNama = perubahanNamaSchema.safeParse(perubahanNama);
+
+        console.log("checkPerubahanNama", checkPerubahanNama);
+
+        if (checkPerubahanNama.success === false) {
+          checkPerubahanNama.error.issues.forEach((issue) => {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: issue.message,
+              path: ["perubahanNama"],
+            });
+          });
+          // ctx.addIssue({
+          //   code: z.ZodIssueCode.custom,
+          //   message: `Data tidak valid lagi`,
+          //   path: ["perubahanNama"],
+          // });
+          return false;
+        }
+      }
+
+      return z.NEVER;
+    }
+  );
 // .refine(
 //   (data) => {
 //     if (

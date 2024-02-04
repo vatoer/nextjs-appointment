@@ -4,13 +4,20 @@ import { use, useEffect, useState } from "react";
 import { date } from "zod";
 
 interface IYmPickerProps {
-  date: Date;
+  date?: Date;
   fromDate?: Date;
   toDate?: Date;
   onSelect?: (date: Date) => void;
+  locale?: Locale;
 }
 
-const YmPicker = ({ date, fromDate, toDate, onSelect }: IYmPickerProps) => {
+const YmPicker = ({
+  date,
+  fromDate,
+  toDate,
+  onSelect,
+  locale,
+}: IYmPickerProps) => {
   const years = range(
     getYear(fromDate ?? new Date().getFullYear() - 1),
     getYear(toDate ?? new Date().getFullYear() + 1) + 1,
@@ -33,7 +40,7 @@ const YmPicker = ({ date, fromDate, toDate, onSelect }: IYmPickerProps) => {
 
   const months = Array.from({ length: 12 }, (_, i) => {
     const date = new Date(2022, i, 1);
-    return new Intl.DateTimeFormat("en-US", { month: "long" }).format(date);
+    return format(date, "MMMM", { locale: locale });
   });
 
   //console.log("monthsIntl", months);
@@ -44,10 +51,22 @@ const YmPicker = ({ date, fromDate, toDate, onSelect }: IYmPickerProps) => {
   useEffect(() => {
     setYear(getYear(date ?? new Date()));
     setMonth(getMonth(date ?? new Date()));
-    console.log("date", date);
+    //console.log("date", date);
   }, [date]);
 
-  console.log("year", year);
+  //console.log("year", year);
+
+  const checkIsOutOfRange = (newDate: Date) => {
+    const ym = format(newDate, "yyyyMM");
+    const ymFrom = format(fromDate ?? new Date(), "yyyyMM");
+    const ymTo = format(toDate ?? new Date(), "yyyyMM");
+    const isOutOfRange =
+      parseInt(ym) < parseInt(ymFrom) || parseInt(ym) > parseInt(ymTo);
+    if (isOutOfRange) {
+      alert("out of range");
+    }
+    return isOutOfRange;
+  };
 
   return (
     <div className="flex items-center justify-between w-full">
@@ -56,8 +75,14 @@ const YmPicker = ({ date, fromDate, toDate, onSelect }: IYmPickerProps) => {
         className="w-1/2 p-2 border border-gray-300 rounded-md"
         onChange={(e) => {
           const year = parseInt(e.target.value);
-          setYear(year);
-          onSelect && onSelect(new Date(year, month, 1));
+          const newDate = new Date(year, month, 1);
+
+          if (checkIsOutOfRange(newDate)) {
+            return;
+          } else {
+            setYear(year);
+            onSelect && onSelect(new Date(year, month, 1));
+          }
         }}
       >
         {years.map((y) => (
@@ -72,21 +97,11 @@ const YmPicker = ({ date, fromDate, toDate, onSelect }: IYmPickerProps) => {
         onChange={(e) => {
           const month = parseInt(e.target.value);
           const newDate = new Date(year, month, 1);
-          const ym = format(newDate, "yyyyMM");
-          const ymFrom = format(fromDate ?? new Date(), "yyyyMM");
-          const ymTo = format(toDate ?? new Date(), "yyyyMM");
-          if (
-            parseInt(ym) < parseInt(ymFrom) ||
-            parseInt(ym) > parseInt(ymTo)
-          ) {
-            alert("out of range");
+          if (checkIsOutOfRange(newDate)) {
             return;
           } else {
             setMonth(month);
             onSelect && onSelect(newDate);
-            console.log("newDate", newDate);
-            console.log("year", year);
-            console.log("month", month);
           }
         }}
       >

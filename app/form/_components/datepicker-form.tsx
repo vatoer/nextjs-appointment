@@ -26,8 +26,11 @@ const DatePickerForm = ({
   ...props
 }: DatePickerFormProps) => {
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const handleSelect = (date: Date) => {
-    setSelectedDate(format(date, "yyyy-MM-dd"));
+  const handleSelect = (date?: Date) => {
+    if (!date) return;
+    const selected = format(date, "dd-MM-yyyy");
+    setSelectedDate(selected);
+    console.log("date", selected);
   };
   return (
     <div
@@ -40,13 +43,12 @@ const DatePickerForm = ({
         {label}
       </label>
       <DatePicker
-        date={new Date()}
-        //date={props.date}
         onSelect={handleSelect}
         fromDate={props.fromDate}
         toDate={props.toDate}
+        locale={props.locale}
       />
-      <input type="hidden" id={name} {...register(name)} value={selectedDate} />
+      <input type="text" id={name} {...register(name)} value={selectedDate} />
       {error && <span className="text-red-500">{error.message}</span>}
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import YmPicker from "@/components/date-picker/ym-picker";
 import { Button } from "@/components/ui/button";
 import { Calendar, CalendarProps } from "@/components/ui/calendar";
 import {
@@ -12,28 +13,35 @@ import { cn } from "@/lib/utils";
 import { format, getYear } from "date-fns";
 import { enGB, id } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { useState } from "react";
+import { RefObject, createRef, forwardRef, useState } from "react";
 import {
   DayPicker,
   DayPickerSingleProps,
   SelectSingleEventHandler,
 } from "react-day-picker";
-import YmPicker from "./date-picker/ym-picker";
+import InputForm, { InputFormProps } from "./input-form";
 
 //export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 interface IDatePickerProps {
   date?: Date;
   onSelect?: (date?: Date) => void;
+  ref: RefObject<unknown>;
 }
 
-export type DatePickerProps = IDatePickerProps & CalendarProps;
+export type InputDatePickerProps = IDatePickerProps &
+  InputFormProps &
+  CalendarProps;
 
-export const DatePicker = ({
+  const ref = createRef();
+
+export const InputDatePicker = forwardRef({
   date: Initdate,
   onSelect,
+  error,
+  ref
   ...props
-}: DatePickerProps) => {
+}: InputDatePickerProps) => {
   const [date, setDate] = useState<Date | undefined>(Initdate);
   const [month, setMonth] = useState<Date | undefined>(date);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -52,20 +60,14 @@ export const DatePicker = ({
   return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant={"outline"}
-          className={cn(
-            "w-[280px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? (
-            format(date, "PPP", { locale: props.locale ?? id })
-          ) : (
-            <span>Pick a date</span>
-          )}
-        </Button>
+        <InputForm
+          label="Tanggal Lahir"
+          register={props.register}
+          name="tanggalLahir"
+          error={error}
+          className="md:w-1/3"
+          value={date ? format(date, "dd-MM-yyyy") : ""}
+        />
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
         <YmPicker
@@ -90,4 +92,4 @@ export const DatePicker = ({
   );
 };
 
-export default DatePicker;
+export default InputDatePicker;
