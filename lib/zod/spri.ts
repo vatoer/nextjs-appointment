@@ -13,11 +13,19 @@ export const statusSipilSchema = z.nativeEnum(StatusSipil, {
 
 export const genericStringSchema = z.string().min(3).max(25);
 
-export const genericTanggalSchema = z.coerce.date({
-  errorMap: (issue, ctx) => ({
-    message: "Tanggal tidak valid ",
-  }),
-});
+export const genericTanggalSchema = z
+  .string()
+  .min(10, {
+    message: "Please input with format dd-mm-yyyy",
+  })
+  .pipe(
+    z.coerce
+      .date({
+        required_error: "Please select a date and time",
+        invalid_type_error: "That's not a date!",
+      })
+      .min(new Date("1900-01-01"), { message: "Too old" })
+  );
 
 export const perubahanNamaSchema = z.string().min(3).max(25);
 

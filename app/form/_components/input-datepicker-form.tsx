@@ -13,33 +13,39 @@ import { cn } from "@/lib/utils";
 import { format, getYear } from "date-fns";
 import { enGB, id } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { RefObject, createRef, forwardRef, useState } from "react";
+import { register } from "module";
+import { InputHTMLAttributes, useState } from "react";
 import {
   DayPicker,
   DayPickerSingleProps,
   SelectSingleEventHandler,
 } from "react-day-picker";
-import InputForm, { InputFormProps } from "./input-form";
+import { FieldError, UseFormRegister } from "react-hook-form";
 
 //export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 interface IDatePickerProps {
   date?: Date;
   onSelect?: (date?: Date) => void;
-  ref: RefObject<unknown>;
+  label: string;
+  type?: string;
+  register: UseFormRegister<any>;
+  name: string;
+  error: FieldError | undefined;
+  className?: string;
 }
 
-export type InputDatePickerProps = IDatePickerProps &
-  InputFormProps &
-  CalendarProps;
+export type InputDatePickerProps = IDatePickerProps & CalendarProps;
 
-  const ref = createRef();
-
-export const InputDatePicker = forwardRef({
+export const InputDatePicker = ({
   date: Initdate,
   onSelect,
+  label,
+  register,
+  name,
   error,
-  ref
+  type = "text",
+  className,
   ...props
 }: InputDatePickerProps) => {
   const [date, setDate] = useState<Date | undefined>(Initdate);
@@ -47,7 +53,6 @@ export const InputDatePicker = forwardRef({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const handleSelect: SelectSingleEventHandler = (newDate) => {
-    //console.log("newDate", newDate);
     setDate(newDate ?? date);
     onSelect && onSelect(newDate ?? date);
     setIsPopoverOpen(false);
@@ -60,14 +65,35 @@ export const InputDatePicker = forwardRef({
   return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
       <PopoverTrigger asChild>
-        <InputForm
-          label="Tanggal Lahir"
-          register={props.register}
-          name="tanggalLahir"
-          error={error}
-          className="md:w-1/3"
-          value={date ? format(date, "dd-MM-yyyy") : ""}
-        />
+        <div
+          className={cn(
+            "flex flex-col w-full mt-1 md:mt-0",
+            className && className
+          )}
+        >
+          <label htmlFor={name} className="text-sm">
+            {label}
+          </label>
+          <div className="relative group">
+            <CalendarIcon className="absolute top-2 ml-2 text-gray-700" />
+            <input
+              placeholder="dd-mm-yyyy"
+              //readOnly
+              // value={
+              //   date
+              //     ? format(date, "yyyy-MM-dd", { locale: props.locale ?? id })
+              //     : ""
+              // }
+              type={"text"}
+              id={name}
+              {...register(name)}
+              className={cn(
+                "form-control block w-full px-1 pl-10 py-2 text-sm font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none peer"
+              )}
+            />
+          </div>
+          {error && <span className="text-red-500">{error.message}</span>}
+        </div>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
         <YmPicker

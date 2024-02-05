@@ -127,7 +127,7 @@ const SpriForm = () => {
             error={errors.tempatLahir}
             className="md:w-2/3"
           />
-          <DatePickerForm
+          <InputDatePicker
             label="Tanggal Lahir"
             register={register}
             name="tanggalLahir"
