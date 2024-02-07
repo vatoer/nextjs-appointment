@@ -1,7 +1,6 @@
-import { format, getMonth, getTime, getYear } from "date-fns";
+import { Locale, format, getMonth, getYear } from "date-fns";
 import { range } from "lodash";
-import { use, useEffect, useState } from "react";
-import { date } from "zod";
+import { useEffect, useState } from "react";
 
 interface IYmPickerProps {
   date?: Date;
@@ -23,20 +22,6 @@ const YmPicker = ({
     getYear(toDate ?? new Date().getFullYear() + 1) + 1,
     1
   );
-  // const months = [
-  //   "January",
-  //   "February",
-  //   "March",
-  //   "April",
-  //   "May",
-  //   "June",
-  //   "July",
-  //   "August",
-  //   "September",
-  //   "October",
-  //   "November",
-  //   "December",
-  // ];
 
   const months = Array.from({ length: 12 }, (_, i) => {
     const date = new Date(2022, i, 1);

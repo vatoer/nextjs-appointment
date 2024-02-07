@@ -1,7 +1,7 @@
 "use client";
 import DatePickerForm from "@/app/form/_components/datepicker-form";
 import FormRow from "@/app/form/_components/form-row";
-import InputDatePicker from "@/app/form/_components/input-datepicker-form";
+import InputDatePicker from "@/app/form/_components/input-datepicker";
 import InputForm from "@/app/form/_components/input-form";
 import SelectForm from "@/app/form/_components/select-form";
 import DatePicker from "@/components/date-picker";
@@ -30,6 +30,7 @@ const SpriForm = () => {
   const router = useRouter();
   const {
     register,
+    setValue,
     handleSubmit,
     formState: {
       errors,
@@ -130,6 +131,7 @@ const SpriForm = () => {
           <InputDatePicker
             label="Tanggal Lahir"
             register={register}
+            setValue={setValue}
             name="tanggalLahir"
             error={errors.tanggalLahir}
             className="md:w-1/3"

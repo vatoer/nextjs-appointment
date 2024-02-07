@@ -20,7 +20,7 @@ import {
   DayPickerSingleProps,
   SelectSingleEventHandler,
 } from "react-day-picker";
-import { FieldError, UseFormRegister } from "react-hook-form";
+import { FieldError, UseFormRegister, UseFormSetValue } from "react-hook-form";
 
 //export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
@@ -30,6 +30,7 @@ interface IDatePickerProps {
   label: string;
   type?: string;
   register: UseFormRegister<any>;
+  setValue: UseFormSetValue<any>;
   name: string;
   error: FieldError | undefined;
   className?: string;
@@ -42,6 +43,7 @@ export const InputDatePicker = ({
   onSelect,
   label,
   register,
+  setValue,
   name,
   error,
   type = "text",
@@ -50,11 +52,18 @@ export const InputDatePicker = ({
 }: InputDatePickerProps) => {
   const [date, setDate] = useState<Date | undefined>(Initdate);
   const [month, setMonth] = useState<Date | undefined>(date);
+  const [ymDate, setYmDate] = useState<Date | undefined>(date);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const handleSelect: SelectSingleEventHandler = (newDate) => {
     setDate(newDate ?? date);
     onSelect && onSelect(newDate ?? date);
+    if (newDate) {
+      const newDateStr = format(newDate, "dd-MM-yyyy", {
+        locale: props.locale ?? id,
+      });
+      setValue(name, newDateStr);
+    }
     setIsPopoverOpen(false);
   };
 
@@ -78,12 +87,7 @@ export const InputDatePicker = ({
             <CalendarIcon className="absolute top-2 ml-2 text-gray-700" />
             <input
               placeholder="dd-mm-yyyy"
-              //readOnly
-              // value={
-              //   date
-              //     ? format(date, "yyyy-MM-dd", { locale: props.locale ?? id })
-              //     : ""
-              // }
+              readOnly
               type={"text"}
               id={name}
               {...register(name)}
@@ -99,7 +103,7 @@ export const InputDatePicker = ({
         <YmPicker
           fromDate={props.fromDate ?? defaultStartDate}
           toDate={props.toDate ?? defaultEndDate}
-          onSelect={setMonth}
+          onSelect={setYmDate}
           date={date}
           locale={props.locale ?? id}
         />
@@ -110,8 +114,8 @@ export const InputDatePicker = ({
           onSelect={handleSelect}
           fromDate={props.fromDate ?? defaultStartDate}
           toDate={props.toDate ?? defaultEndDate}
-          month={month ?? date}
-          onMonthChange={setMonth}
+          month={ymDate ?? date}
+          onMonthChange={setYmDate}
         />
       </PopoverContent>
     </Popover>
